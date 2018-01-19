@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using Domain.Model;
+﻿using Domain.Model;
 
-namespace Data.Model
+namespace Data.Model.Server
 {
     public class UserEntity
     {

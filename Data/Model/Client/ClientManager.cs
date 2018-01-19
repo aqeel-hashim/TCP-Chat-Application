@@ -9,6 +9,13 @@ namespace Data.Model.Client
     {
         private UserEntity _userEntity;
         private IMessageReceiver _messageReceiver;
+
+        public IMessageReceiver MessageReceiver
+        {
+            get => _messageReceiver;
+            set => _messageReceiver = value;
+        }
+
         public ClientManager(UserEntity userEntity, IMessageReceiver messageReceiver)
         {
             _userEntity = userEntity;

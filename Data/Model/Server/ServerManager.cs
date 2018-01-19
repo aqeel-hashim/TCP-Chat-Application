@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Model;
 using Domain.Repository;
 
-namespace Data.Model
+namespace Data.Model.Server
 {
     public class ServerManager : IMessageSender, IConnectionManager
     {
 
-        private readonly Listner _listner;
+        private Listner _listner;
         private List<UserEntity> _clients;
         private IMessageReceiver _messageReceiver;
-        public Listner Listner => _listner;
+
+        public Listner Listner
+        {
+            get => _listner;
+            set => _listner = value;
+        }
 
         public List<UserEntity> Clients
         {

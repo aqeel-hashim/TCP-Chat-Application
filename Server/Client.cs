@@ -1,37 +1,42 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Model.Server
+namespace Server
 {
-    public class SocketManager
+    public class Client
     {
-        public delegate void ClientReceivedHandler(string data);
-        public delegate void ClientDisconnectedHandler();
+        public delegate void ClientReceivedHandler(Client sender, byte[] data);
+        public delegate void ClientDisconnectedHandler(Client sender);
         public event ClientReceivedHandler Received;
         public event ClientDisconnectedHandler Disconnected;
 
-        public IPEndPoint Ip { get; private set; }
 
+        public IPEndPoint Ip { get; private set; }
+        
 
         public Socket _socket;
 
-        public Socket Socket
-        {
-            get => _socket;
-            set => _socket = value;
-        }
+        public Client(Socket accepted)
+        {   
+            Parallel.Invoke(() =>
+            {
 
-        public SocketManager(Socket accepted)
-        {
-            _socket = accepted;
-            Ip = (IPEndPoint)_socket.RemoteEndPoint;
-            Parallel.Invoke(() => { _socket.BeginReceive(new byte[] { 0 }, 0, 0, 0, Callback, null); });
+                _socket = accepted;
+                Ip = (IPEndPoint)_socket.RemoteEndPoint;
+                _socket.BeginReceive(new byte[] { 0 }, 0, 0, 0, Callback, null);
+
+            });
+           
         }
 
         void Callback(IAsyncResult ar)
         {
+            Parallel.Invoke(() =>
+            {
+
                 try
                 {
                     _socket.EndReceive(ar);
@@ -41,7 +46,10 @@ namespace Data.Model.Server
                     {
                         Array.Resize(ref buffer, rec);
                     }
-                    Parallel.Invoke(() => { Received?.Invoke(ByteArrayFormatter.DeserializeMessage(buffer, rec));  });
+                    if (Received != null)
+                    {
+                        Received(this, buffer);
+                    }
                     _socket.BeginReceive(new byte[] { 0 }, 0, 0, 0, Callback, null);
 
                 }
@@ -50,21 +58,23 @@ namespace Data.Model.Server
                     Close();
                     if (Disconnected != null)
                     {
-                        Parallel.Invoke(() => { Disconnected(); });
+                        Disconnected(this);
                     }
                 }
+
+            });
         }
 
         public void Send(string data)
-        {
+        { 
             Parallel.Invoke(() =>
             {
 
-                var buffer = ByteArrayFormatter.Format(data);
+                var buffer = Encoding.ASCII.GetBytes(data);
                 _socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, ar => _socket.EndSend(ar), buffer);
 
             });
-
+            
         }
 
         public void Close()
@@ -73,9 +83,9 @@ namespace Data.Model.Server
             {
                 _socket.Dispose();
                 _socket.Close();
-                _socket = null;
-            });
 
+            });
+            
         }
     }
 }

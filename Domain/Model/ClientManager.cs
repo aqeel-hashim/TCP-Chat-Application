@@ -45,11 +45,12 @@ namespace Domain.Model
             set => _serverRequest = value;
         }
 
-        public ClientManager(User server, User currentUser, List<User> connectedUsers, IMessageProcessor messageProcessor, IServerRequest serverRequest)
+
+        public ClientManager(User server, User currentUser, IMessageProcessor messageProcessor, IServerRequest serverRequest)
         {
             _server = server;
             _currentUser = currentUser;
-            _connectedUsers = connectedUsers;
+            _connectedUsers = new List<User>();
             _messageProcessor = messageProcessor;
             _serverRequest = serverRequest;
         }

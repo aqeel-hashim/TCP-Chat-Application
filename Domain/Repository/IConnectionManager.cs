@@ -13,7 +13,9 @@ namespace Domain.Repository
     }
 
     public interface IConnectionManager
-    { 
+    {
+        void Start();
+        void Stop();
         void Disconnect(User user);
         Domain.Repository.Status CheckStatus(User user);
     }
