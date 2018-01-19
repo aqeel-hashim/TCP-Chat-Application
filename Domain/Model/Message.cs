@@ -75,5 +75,7 @@ namespace Domain.Model
                 return hashCode;
             }
         }
+
+       
     }
 }

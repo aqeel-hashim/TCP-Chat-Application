@@ -32,9 +32,9 @@ namespace Client
                 Client.Server.IpAddress = txtIP.Text;
                 Client.CurrentUser.Name = txtNickname.Text;
                 Client.Connect();
-                this.Invoke(() => { Close(); });
             });
-           
+            Close();
+
         }
 
     }

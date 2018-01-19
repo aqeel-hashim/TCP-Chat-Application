@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Domain.Model;
 using Domain.Repository;
+using Newtonsoft.Json;
 
 namespace Data.Model.Server
 {
@@ -24,9 +25,16 @@ namespace Data.Model.Server
             set => _clients = value;
         }
 
-        public ServerManager(Listner listner)
+        public IMessageReceiver MessageReceiver
+        {
+            get => _messageReceiver;
+            set => _messageReceiver = value;
+        }
+
+        public ServerManager(Listner listner, IMessageReceiver messageReceiver)
         {
             _listner = listner;
+            _messageReceiver = messageReceiver;
             _listner.SocketAccepted += listner_SocketAccepted;
             _clients = new List<UserEntity>();
         }
@@ -60,7 +68,7 @@ namespace Data.Model.Server
         {
             Parallel.ForEach(_clients, (client) =>
             {
-                if (client.User.Equals(user))
+                if (client.User.IpAddress.Equals(user.IpAddress))
                 {
                     client.Socket.Send(message);
                 }
@@ -73,7 +81,7 @@ namespace Data.Model.Server
             {
                 Parallel.ForEach(users, (user) =>
                 {
-                    if (client.User.Equals(user))
+                    if (client.User.IpAddress.Equals(user.IpAddress))
                     {
                         client.Socket.Send(message);
                     }
@@ -85,9 +93,9 @@ namespace Data.Model.Server
         {
             Parallel.ForEach(_clients, (client) =>
             {
-                if (!client.User.Equals(user)) return;
+                if (!client.User.IpAddress.Equals(user.IpAddress)) return;
                 client.Socket.Close();
-                _messageReceiver.Received(JsonFormatter.Format(new Message(user, null, "DISCONNECT", Message.Type.Disconnect)));
+                _messageReceiver.Received(JsonConvert.SerializeObject(new Message(user, null, "DISCONNECT", Message.Type.Disconnect)));
                 _clients.Remove(client);
             });
         }
@@ -97,7 +105,7 @@ namespace Data.Model.Server
             var status = Status.Unknown;
             Parallel.ForEach(_clients, (client) =>
             {
-                if (client.User.Equals(user))
+                if (client.User.IpAddress.Equals(user.IpAddress))
                 {
                     status = client.Socket.Socket == null ? Status.Disconnected : Status.Connected;
                 }

@@ -68,13 +68,13 @@ namespace Domain.Model
         public void SendMessage(string message, User user, Message.Type type)
         {
             var messageObj = new Message(_currentUser, user, message, type);
-            _serverRequest.Send(JsonFormatter.Format(messageObj));
+            _serverRequest.Send(JsonConvert.SerializeObject(messageObj));
             _messageProcessor.Print(messageObj);
         }
 
         public void Received(string message)
         {
-            var messageReceived = JsonFormatter.DeserializeMessage(message);
+            var messageReceived = JsonConvert.DeserializeObject<Message>(message);
             switch (messageReceived.MessageType)
             {
                 case Message.Type.OneToOne:
@@ -87,7 +87,7 @@ namespace Domain.Model
                     else if (messageReceived.MessageText.Equals("CONNECTION_SUCCESS"))
                     {
                         _serverRequest.Send(
-                            JsonFormatter.Format(new Message(_currentUser, _server, "CONNECTION_SUCCESS", Message.Type.Connect)));
+                            JsonConvert.SerializeObject(new Message(_currentUser, _server, "CONNECTION_SUCCESS", Message.Type.Connect)));
                         break;
                     }
                     break;
@@ -96,6 +96,7 @@ namespace Domain.Model
                     _messageProcessor.Disconnect();
                     break;
                 case Message.Type.Refresh:
+
                     _messageProcessor.UpdateUsers(JsonConvert.DeserializeObject<List<User>>(messageReceived.MessageText));
                     break;
                 default:

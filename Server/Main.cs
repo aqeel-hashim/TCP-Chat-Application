@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using System.Net.Sockets;
@@ -13,28 +14,22 @@ namespace Server
 {
     public partial class Main : Form, IMessageProcessor
     {
-        private readonly Listener listener;
         private ServerManager _manager;
-        public List<Socket> clients = new List<Socket>();//stores all the clients into  a list
         private List<User> users;
-        public void BroadcastData(string data) // send to all clients
-        {
-            Parallel.ForEach(clients, (socket) =>
-            {
-
-                try { socket.Send(Encoding.ASCII.GetBytes(data)); }
-                catch (Exception) { }
-
-            });
-        }
-
+       
         public Main()
         {
             InitializeComponent();
-            var dataserver = new Data.Model.Server.ServerManager(new Data.Model.Listner(2014, null));
-            _manager = new ServerManager(new Domain.Model.Server(new List<User>(), "" ), dataserver, dataserver, this );
+            string hostName = Dns.GetHostName(); // Retrive the Name of HOST  
+            Console.WriteLine(hostName);
+            // Get the IP  
+            string myIP = Dns.GetHostEntry(hostName).AddressList[0].ToString();
+            var dataserver = new Data.Model.Server.ServerManager(new Data.Model.Listner(2014, null), null);
+            _manager = new ServerManager(new Domain.Model.Server(new List<User>(), myIP ), dataserver, dataserver, this );
             ((Data.Model.Server.ServerManager) _manager.MessageSender).Listner.ConnectionListener = _manager;
             ((Data.Model.Server.ServerManager) _manager.ConnectionManager).Listner.ConnectionListener = _manager;
+            ((Data.Model.Server.ServerManager) _manager.ConnectionManager).MessageReceiver = _manager;
+            ((Data.Model.Server.ServerManager) _manager.ConnectionManager).MessageReceiver = _manager;
             _manager.Start();
             
         }
@@ -48,20 +43,20 @@ namespace Server
   
         private void Main_Load(object sender, EventArgs e)
         {
-            listener.Start();
+            _manager.Start();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            listener.Stop();
+            _manager.Stop();
         }
 
         private void btnSend_Click(object sender, EventArgs e)
         {
             if (txtInput.Text != string.Empty)
             {
-                _manager.SendMessage(new Message(new User(_manager.Server.IpAddress, "Admin"), null, txtInput.Text, Message.Type.OneToMany ));
+                _manager.SendMessage(new Message(new User(_manager.Server.IpAddress, "Admin"), new User("",""), txtInput.Text, Message.Type.OneToMany ));
             }
         }
 
@@ -108,7 +103,7 @@ namespace Server
 
         public void Print(Message message)
         {
-            txtReceive.Text += "\n" + message.FromUser + " says: " + message.MessageText;
+            txtReceive.Text += "\n" + message.FromUser.Name + " says: " + message.MessageText;
         }
 
         public void UpdateUsers(List<User> users)
