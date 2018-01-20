@@ -102,12 +102,12 @@ namespace Domain.Model
                                     _connectionManager.Disconnect(userFrom);
                                     var userstringlist = (string.Join(",", _server.Users.Select(x => x.ToString()).ToArray()));
                                     var messageDisconnect =
-                                        new Message(new User(_server.IpAddress, "SERVER"), null,
+                                        new Message(new User(_server.IpAddress, "SERVER"), new User(), 
                                             JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
-                                    _messageProcessor.Print(new Message(null, null, userFrom.Name+"@"+userFrom.IpAddress+" Disconnected", Message.Type.Disconnect));
+                                    _messageProcessor.Print(new Message(new User(), new User(), userFrom.Name+"@"+userFrom.IpAddress+" Disconnected", Message.Type.Disconnect));
                                     _messageProcessor.UpdateUsers(_server.Users);
                                     _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(messageDisconnect));
-                                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), null, userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany )));
+                                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany )));
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
@@ -131,7 +131,7 @@ namespace Domain.Model
 
         public void Received(string message)
         {
-            var receivedMessage = JsonConvert.DeserializeObject<Message>(message);
+            var receivedMessage = JsonFormatter.DeserializeMessage(message);
             _messageProcessor.Print(receivedMessage);
             User userFrom;
             switch (receivedMessage.MessageType)
@@ -143,7 +143,7 @@ namespace Domain.Model
                         new Message(new User(_server.IpAddress, "SERVER"), null, JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
                     _messageProcessor.UpdateUsers(_server.Users);
                     _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(messageConnect));
-                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), null, userFrom.Name + "@" + userFrom.IpAddress + " Connected", Message.Type.OneToMany)));
+                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Connected", Message.Type.OneToMany)));
                     break;
                 case Message.Type.Disconnect:
                      userFrom = receivedMessage.FromUser;
@@ -153,7 +153,7 @@ namespace Domain.Model
                         new Message(new User(_server.IpAddress, "SERVER"), null, JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
                     _messageProcessor.UpdateUsers(_server.Users);
                     _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(messageDisconnect));
-                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), null, userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany)));
+                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany)));
                     break;
                 case Message.Type.OneToOne:
                     _messageProcessor.Print(receivedMessage);

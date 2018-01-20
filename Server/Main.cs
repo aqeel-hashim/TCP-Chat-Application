@@ -103,23 +103,33 @@ namespace Server
 
         public void Print(Message message)
         {
-            txtReceive.Text += "\n" + message.FromUser.Name + " says: " + message.MessageText;
+            this.Invoke(() =>
+            {
+
+                txtReceive.Text += "\n" + message.FromUser.Name + " says: " + message.MessageText;
+
+            });
+           
         }
 
         public void UpdateUsers(List<User> users)
         {
-            this.users = users;
-            clientList.Clear();
-            foreach (var user in this.users)
+            this.Invoke(() =>
             {
-                var item = new ListViewItem(new string[] {user.IpAddress, user.Name, "CONNECTED"}) { Tag = user };
-                clientList.Items.Add(item);
-            }
+                this.users = users;
+                clientList.Clear();
+                foreach (var user in this.users)
+                {
+                    var item = new ListViewItem(new string[] { user.IpAddress, user.Name, "CONNECTED" }) { Tag = user };
+                    clientList.Items.Add(item);
+                }
+            });
+            
         }
 
         public void Disconnect()
         {
-            Close();
+            this.Invoke(Close);
         }
     }
 }

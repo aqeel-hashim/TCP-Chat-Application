@@ -19,6 +19,12 @@ namespace Domain.Model
             set => _name = value;
         }
 
+        public User()
+        {
+            _ipAddress = "";
+            _name = "";
+        }
+
         public User(string ipAddress, string name)
         {
             _ipAddress = ipAddress;

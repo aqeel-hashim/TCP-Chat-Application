@@ -45,7 +45,10 @@ namespace Domain.Model
 
         public Message()
         {
-
+            _fromUser = new User();
+            _toUser = new User();
+            _message = "";
+            _type = Type.Connect;
         }
 
         public Message(User fromUser, User toUser, string message, Type type)
