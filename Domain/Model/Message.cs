@@ -43,6 +43,11 @@ namespace Domain.Model
             set => _type = value;
         }
 
+        public Message()
+        {
+
+        }
+
         public Message(User fromUser, User toUser, string message, Type type)
         {
             _fromUser = fromUser;

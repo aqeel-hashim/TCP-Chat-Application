@@ -95,7 +95,7 @@ namespace Data.Model.Server
             {
                 if (!client.User.IpAddress.Equals(user.IpAddress)) return;
                 client.Socket.Close();
-                _messageReceiver.Received(JsonConvert.SerializeObject(new Message(user, null, "DISCONNECT", Message.Type.Disconnect)));
+                _messageReceiver.Received(JsonFormatter.FormatMessage(new Message(user, null, "DISCONNECT", Message.Type.Disconnect)));
                 _clients.Remove(client);
             });
         }

@@ -62,29 +62,29 @@ namespace Server
 
         private void disconnectClientToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var list = clientList.SelectedItems.Cast<ListViewItem>();
-            Parallel.ForEach(list, (item) =>
-            {
-                var client = item.Tag as Client;
-                client.Send("Disconnect|");
-
-            });
+//            var list = clientList.SelectedItems.Cast<ListViewItem>();
+//            Parallel.ForEach(list, (item) =>
+//            {
+//                var client = item.Tag as Client;
+//                client.Send("Disconnect|");
+//
+//            });
         }
 
         private void chatWithClientToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var list = clientList.SelectedItems.Cast<ListViewItem>();
-            Parallel.ForEach(list, (item) =>
-            {
-                var client = item.Tag as Client;
-                client.Send("Disconnect|");
-                pChat = new PrivateChat(this);
-                Task task = new Task(() => { this.Invoke(() => { pChat.Show(); });
-                });
-                pChat.Task = task;
-                task.Start();
-
-            });
+//            var list = clientList.SelectedItems.Cast<ListViewItem>();
+//            Parallel.ForEach(list, (item) =>
+//            {
+//                var client = item.Tag as Client;
+//                client.Send("Disconnect|");
+//                pChat = new PrivateChat(this);
+//                Task task = new Task(() => { this.Invoke(() => { pChat.Show(); });
+//                });
+//                pChat.Task = task;
+//                task.Start();
+//
+//            });
         }
 
         private void txtInput_KeyDown(object sender, KeyEventArgs e)
