@@ -36,7 +36,7 @@ namespace Client
                 Client.Server.IpAddress = txtIP.Text;
                 Client.CurrentUser.Name = txtNickname.Text;
                 Console.WriteLine(Client.CurrentUser.IpAddress);
-                Client.Connect();
+                Client.Connect(txtNickname.Text);
             });
             Close();
 

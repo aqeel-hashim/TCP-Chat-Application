@@ -47,6 +47,7 @@ namespace Client
         {
             if (txtInput.Text == string.Empty) return;
             client.SendMessage(txtInput.Text, _other, Message.Type.OneToOne);
+            txtReceive.AppendText("\r\n"+"I say: "+txtInput.Text);
             txtInput.Text = string.Empty;
         }
 

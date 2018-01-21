@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Dummy": {
+      "commandName": "Executable",
+      "executablePath": "E:\\Code\\Desktop\\C#\\TCP Chat Application\\Client\\bin\\Debug\\Client.exe"
+    },
+    "newProfile1": {
+      "commandName": "Executable"
+    }
+  }
+}

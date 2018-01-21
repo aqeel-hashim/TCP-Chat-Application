@@ -38,9 +38,9 @@ namespace Data.Model.Client
             _userEntity.SocketManager.Close();
         }
 
-        public void Connect(string ipAddress)
+        public void Connect(string ipAddress, string nickname)
         {
-            _userEntity.SocketManager.Connect(ipAddress, 2014);
+            _userEntity.SocketManager.Connect(ipAddress, 2014, nickname);
         }
     }
 }

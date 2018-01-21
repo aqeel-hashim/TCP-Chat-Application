@@ -70,9 +70,9 @@ namespace Data.Model
             try
             {
                 var s = _socket.EndAccept(ar);
-                SocketAccepted?.Invoke(new UserEntity(new User((s.RemoteEndPoint as IPEndPoint)?.Address.ToString(), ""), new SocketManager(s)));
+                SocketAccepted?.Invoke(new UserEntity(new User((s.LocalEndPoint as IPEndPoint)?.Address.ToString(), ""), new SocketManager(s)));
                 _socket.BeginAccept(Callback, null);
-                _connectionListener.Accept(new User((s.RemoteEndPoint as IPEndPoint)?.Address.ToString(), ""));
+                _connectionListener.Accept(new User((s.LocalEndPoint as IPEndPoint)?.Address.ToString(), ""));
 
             }
             catch (Exception ex)

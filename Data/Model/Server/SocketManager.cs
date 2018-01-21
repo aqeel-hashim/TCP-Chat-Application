@@ -7,7 +7,7 @@ namespace Data.Model.Server
 {
     public class SocketManager
     {
-        public delegate void ClientReceivedHandler(string data);
+        public delegate void ClientReceivedHandler(string data, SocketManager socket);
         public delegate void ClientDisconnectedHandler();
         public event ClientReceivedHandler Received;
         public event ClientDisconnectedHandler Disconnected;
@@ -41,7 +41,7 @@ namespace Data.Model.Server
                     {
                         Array.Resize(ref buffer, rec);
                     }
-                    Parallel.Invoke(() => { Received?.Invoke(ByteArrayFormatter.DeserializeMessage(buffer, rec));  });
+                    Parallel.Invoke(() => { Received?.Invoke(ByteArrayFormatter.DeserializeMessage(buffer, rec), this);  });
                     _socket.BeginReceive(new byte[] { 0 }, 0, 0, 0, Callback, null);
 
                 }

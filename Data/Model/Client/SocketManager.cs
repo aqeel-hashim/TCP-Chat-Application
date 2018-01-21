@@ -19,7 +19,7 @@ namespace Data.Model.Client
             _s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public void Connect(string ip, int port)
+        public void Connect(string ip, int port, string nickname)
         {
             Parallel.Invoke(() =>
             {
@@ -27,7 +27,8 @@ namespace Data.Model.Client
                 try
                 {
                     var ep = new IPEndPoint(IPAddress.Parse(ip), port);
-                    _s.BeginConnect(ep, ConnectCallback, _s);
+                   
+                    _s.BeginConnect(ep, ConnectCallback, nickname);
                 }
                 catch { }
 

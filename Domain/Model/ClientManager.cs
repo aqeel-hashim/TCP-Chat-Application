@@ -60,16 +60,15 @@ namespace Domain.Model
             _serverRequest.Disconnect();
         }
 
-        public void Connect()
+        public void Connect(string nickname)
         {
-            _serverRequest.Connect(_server.IpAddress);
+            _serverRequest.Connect(_server.IpAddress, nickname);
         }
 
         public void SendMessage(string message, User user, Message.Type type)
         {
             var messageObj = new Message(_currentUser, user, message, type);
             _serverRequest.Send(JsonFormatter.FormatMessage(messageObj));
-            _messageProcessor.Print(messageObj);
         }
 
         public void Received(string message)
@@ -79,6 +78,8 @@ namespace Domain.Model
             {
                 case Message.Type.OneToOne:
                 case Message.Type.OneToMany:
+                case Message.Type.PrivateChatConnect:
+                case Message.Type.PrivateChatDisconnect:
                     _messageProcessor.Print(messageReceived);
                     break;
                 case Message.Type.Connect:

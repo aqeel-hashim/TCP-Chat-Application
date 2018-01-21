@@ -16,7 +16,9 @@ namespace Domain.Model
             OneToMany,
             Connect,
             Disconnect,
-            Refresh
+            Refresh,
+            PrivateChatConnect,
+            PrivateChatDisconnect
         }
 
         public User FromUser

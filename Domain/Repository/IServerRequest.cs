@@ -9,7 +9,7 @@ namespace Domain.Repository
     {
         void Send(string message);
         void Disconnect();
-        void Connect(string ipAddress);
+        void Connect(string ipAddress, string nickname);
 
     }
 }

@@ -140,6 +140,7 @@ namespace Domain.Model
                 case Message.Type.Connect:
                     userFrom = receivedMessage.FromUser;
                     _server.Users.Add(userFrom);
+                    Console.WriteLine("User From During Connect: "+userFrom.Name+" and the Ip is: "+userFrom.IpAddress);
                     var messageConnect =
                         new Message(new User(_server.IpAddress, "SERVER"), new User(), JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
                     _messageProcessor.UpdateUsers(_server.Users);
@@ -157,6 +158,8 @@ namespace Domain.Model
                     _messageSender.Broadcast(JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "SERVER"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany)));
                     break;
                 case Message.Type.OneToOne:
+                case Message.Type.PrivateChatDisconnect:
+                case Message.Type.PrivateChatConnect:
                     _messageProcessor.Print(receivedMessage);
                     _messageSender.Send(receivedMessage.ToUser, JsonFormatter.FormatMessage(receivedMessage));
                     break;
