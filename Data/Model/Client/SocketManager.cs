@@ -56,25 +56,36 @@ namespace Data.Model.Client
 
         private void ReadCallback(IAsyncResult ar)
         {
-            Parallel.Invoke(() =>
+
+            Console.WriteLine("Message Socket: Start");
+            try
             {
-
-                var buffer = (byte[])ar.AsyncState;
-                var rec = _s.EndReceive(ar);
-                if (rec != 0)
+                Parallel.Invoke(() =>
                 {
-                    var message = ByteArrayFormatter.DeserializeMessage(buffer, rec);
-                    Received(message);
-                }
-                else
-                {
-                    _connected = false;
-                    Close();
-                    return;
-                }
-                _s.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReadCallback, buffer);
 
-            });
+                    var buffer = (byte[])ar.AsyncState;
+                    var rec = _s.EndReceive(ar);
+                    if (rec != 0)
+                    {
+                        var message = ByteArrayFormatter.DeserializeMessage(buffer, rec);
+                        Console.WriteLine("Message Socket: " + message);
+                        Received(message);
+                    }
+                    else
+                    {
+                        _connected = false;
+                        Close();
+                        return;
+                    }
+                    _s.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReadCallback, buffer);
+
+                });
+            }
+            catch (AggregateException ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+           
 
         }
 

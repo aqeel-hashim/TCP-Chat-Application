@@ -23,7 +23,7 @@ namespace Server
             string hostName = Dns.GetHostName(); // Retrive the Name of HOST  
             Console.WriteLine(hostName);
             // Get the IP  
-            string myIP = Dns.GetHostEntry(hostName).AddressList[0].ToString();
+            string myIP = Dns.GetHostEntry(hostName).AddressList[2].ToString();
             var dataserver = new Data.Model.Server.ServerManager(new Data.Model.Listner(2014, null), null);
             _manager = new ServerManager(new Domain.Model.Server(new List<User>(), myIP ), dataserver, dataserver, this );
             ((Data.Model.Server.ServerManager) _manager.MessageSender).Listner.ConnectionListener = _manager;
@@ -56,7 +56,7 @@ namespace Server
         {
             if (txtInput.Text != string.Empty)
             {
-                _manager.SendMessage(new Message(new User(_manager.Server.IpAddress, "Admin"), new User("",""), txtInput.Text, Message.Type.OneToMany ));
+                _manager.SendMessage(new Message(new User(_manager.Server.IpAddress, "Server"), new User("",""), txtInput.Text, Message.Type.OneToMany ));
             }
         }
 
@@ -117,10 +117,11 @@ namespace Server
             this.Invoke(() =>
             {
                 this.users = users;
-                clientList.Clear();
+                clientList.Items.Clear();
                 foreach (var user in this.users)
                 {
                     var item = new ListViewItem(new string[] { user.IpAddress, user.Name, "CONNECTED" }) { Tag = user };
+                    Console.WriteLine("User added: "+user.Name);
                     clientList.Items.Add(item);
                 }
             });

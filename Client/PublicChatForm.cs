@@ -26,6 +26,7 @@ namespace Client
             formLogin.Client.MessageProcessor =  this;
             formLogin.ShowDialog();
             Text = "TCP Chat - " + formLogin.txtIP.Text + " - (Connected as: " + formLogin.txtNickname.Text + ")";
+            privateChat = new List<PrivateChatUser>();
         }
         
         private List<PrivateChatUser> privateChat;
@@ -52,7 +53,6 @@ namespace Client
         {
             var client = formLogin.Client;
             client.SendMessage(txtInput.Text, null, Message.Type.OneToMany);
-            txtReceive.Text += "\n" + formLogin.txtNickname.Text + "says: " + txtReceive.Text + "\r\n";
             txtInput.Text = string.Empty;
         }
 
@@ -98,53 +98,63 @@ namespace Client
 
         public void Print(Message message)
         {
-            switch (message.MessageType)
+           
+            this.Invoke(() =>
             {
-                case Message.Type.OneToMany:
-                    txtReceive.Text += "\n" + message.FromUser + " says: " + message.MessageText;
-                    break;
-                case Message.Type.OneToOne:
-                    var found = false;
-                    foreach (var chat in privateChat)
-                    {
-                        if (!chat.Other.Equals(message.FromUser)) continue;
-                        chat.txtReceive.Text += "\n" + message.FromUser + " says: " + message.MessageText;
-                        found = true;
-                    }
-
-                    if (!found)
-                    {
-                        foreach (var user in chats)
+                Console.WriteLine("Message: "+message.MessageText);
+                switch (message.MessageType)
+                {
+                    case Message.Type.OneToMany:
+                        txtReceive.AppendText("\n" + message.FromUser.Name + " says: " + message.MessageText);
+                        break;
+                    case Message.Type.OneToOne:
+                        var found = false;
+                        foreach (var chat in privateChat)
                         {
-                            if(!user.Equals(message.FromUser)) continue;
+                            if (!chat.Other.Equals(message.FromUser)) continue;
+                            chat.txtReceive.AppendText("\n"+message.FromUser.Name + " says: " + message.MessageText);
                             found = true;
                         }
-                        if(!found)
-                            chats.Add(message.FromUser);
-                        var chat = new PrivateChatUser(formLogin.Client, message.FromUser);
-                        chat.txtReceive.Text += "\n" + message.FromUser + " says: " + message.MessageText;
-                        chat.Show();
-                        privateChat.Add(chat);
-                    }
 
-                    break;
-            }
+                        if (!found)
+                        {
+                            foreach (var user in chats)
+                            {
+                                if (!user.Equals(message.FromUser)) continue;
+                                found = true;
+                            }
+                            if (!found)
+                                chats.Add(message.FromUser);
+                            var chat = new PrivateChatUser(formLogin.Client, message.FromUser);
+                            txtReceive.AppendText("\n" + message.FromUser.Name + " says: " + message.MessageText);
+                            chat.Show();
+                            privateChat.Add(chat);
+                        }
+
+                        break;
+                }
+            });
         }
 
         public void UpdateUsers(List<User> users)
         {
-            this.chats = users;
-            foreach (var user in chats)
+            this.Invoke(() =>
             {
-                var item = new ListViewItem(user.Name) {Tag = user};
-                this.userList.Items.Add(item);
-            }
+                this.userList.Items.Clear();
+                this.chats = users;
+                foreach (var user in chats)
+                {
+                    var item = new ListViewItem(new[]{user.Name}) { Tag = user };
+                    this.userList.Items.Add(item);
+                }
+            });
+           
             
         }
 
         public void Disconnect()
         {
-            Close();
+            this.Invoke(Close);
         }
     }
 }

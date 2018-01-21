@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Model;
 using Domain.Repository;
@@ -75,17 +76,13 @@ namespace Data.Model.Server
             });
         }
 
-        public void Broadcast(List<User> users, string message)
+        public void Broadcast(string message)
         {
+            
             Parallel.ForEach(_clients, (client) =>
             {
-                Parallel.ForEach(users, (user) =>
-                {
-                    if (client.User.IpAddress.Equals(user.IpAddress))
-                    {
-                        client.Socket.Send(message);
-                    }
-                });
+                Console.WriteLine("Message Server Socket: " + message);
+                client.Socket.Send(message);
             });
         }
 
@@ -94,8 +91,8 @@ namespace Data.Model.Server
             Parallel.ForEach(_clients, (client) =>
             {
                 if (!client.User.IpAddress.Equals(user.IpAddress)) return;
+                _messageReceiver.Received(JsonFormatter.FormatMessage(new Message(user, new User(), "DISCONNECT", Message.Type.Disconnect)));
                 client.Socket.Close();
-                _messageReceiver.Received(JsonFormatter.FormatMessage(new Message(user, null, "DISCONNECT", Message.Type.Disconnect)));
                 _clients.Remove(client);
             });
         }

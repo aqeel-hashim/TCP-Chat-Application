@@ -70,7 +70,7 @@ namespace Domain.Model
         public void SendMessage(Message message)
         {
             if(message.MessageType == Message.Type.OneToMany)
-                _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(message));
+                _messageSender.Broadcast(JsonFormatter.FormatMessage(message));
             else
                 _messageSender.Send(message.ToUser, JsonFormatter.FormatMessage(message));
             _messageProcessor.Print(message);
@@ -104,10 +104,11 @@ namespace Domain.Model
                                     var messageDisconnect =
                                         new Message(new User(_server.IpAddress, "SERVER"), new User(), 
                                             JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
+
                                     _messageProcessor.Print(new Message(new User(), new User(), userFrom.Name+"@"+userFrom.IpAddress+" Disconnected", Message.Type.Disconnect));
                                     _messageProcessor.UpdateUsers(_server.Users);
-                                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(messageDisconnect));
-                                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany )));
+                                    _messageSender.Broadcast(JsonFormatter.FormatMessage(messageDisconnect));
+                                    _messageSender.Broadcast(JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "SERVER"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany )));
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
@@ -140,20 +141,20 @@ namespace Domain.Model
                     userFrom = receivedMessage.FromUser;
                     _server.Users.Add(userFrom);
                     var messageConnect =
-                        new Message(new User(_server.IpAddress, "SERVER"), null, JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
+                        new Message(new User(_server.IpAddress, "SERVER"), new User(), JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
                     _messageProcessor.UpdateUsers(_server.Users);
-                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(messageConnect));
-                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Connected", Message.Type.OneToMany)));
+                    _messageSender.Broadcast(JsonFormatter.FormatMessage(messageConnect));
+                    _messageSender.Broadcast(JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "SERVER"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Connected", Message.Type.OneToMany)));
                     break;
                 case Message.Type.Disconnect:
                      userFrom = receivedMessage.FromUser;
                     _server.Users.Remove(userFrom);
                     _connectionManager.Disconnect(userFrom);
                     var messageDisconnect =
-                        new Message(new User(_server.IpAddress, "SERVER"), null, JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
+                        new Message(new User(_server.IpAddress, "SERVER"), new User(), JsonFormatter.FormatUserList(_server.Users), Message.Type.Refresh);
                     _messageProcessor.UpdateUsers(_server.Users);
-                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(messageDisconnect));
-                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "Admin"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany)));
+                    _messageSender.Broadcast(JsonFormatter.FormatMessage(messageDisconnect));
+                    _messageSender.Broadcast(JsonFormatter.FormatMessage(new Message(new User(_server.IpAddress, "SERVER"), new User(), userFrom.Name + "@" + userFrom.IpAddress + " Disconnected", Message.Type.OneToMany)));
                     break;
                 case Message.Type.OneToOne:
                     _messageProcessor.Print(receivedMessage);
@@ -161,7 +162,7 @@ namespace Domain.Model
                     break;
                 case Message.Type.OneToMany:
                     _messageProcessor.Print(receivedMessage);
-                    _messageSender.Broadcast(_server.Users, JsonFormatter.FormatMessage(receivedMessage));
+                    _messageSender.Broadcast(JsonFormatter.FormatMessage(receivedMessage));
                     break;
                 default:
                     break;

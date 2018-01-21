@@ -8,6 +8,6 @@ namespace Domain.Repository
     public interface IMessageSender
     {
         void Send(User user, string message);
-        void Broadcast(List<User> users, string message);
+        void Broadcast(string message);
     }
 }
